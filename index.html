@@ -1,0 +1,1130 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicFlow - Streaming Musik</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #080808;
+            color: white;
+            min-height: 100vh;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100vh;
+            background: #101010;
+            padding: 25px 18px;
+            border-right: 1px solid #222;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 35px;
+            color: #1ed760;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .menu-title {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 25px 10px 12px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 10px;
+            color: #aaa;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            color: white;
+            background: #202020;
+        }
+
+        .menu-icon {
+            font-size: 20px;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            padding-bottom: 110px;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            height: 70px;
+            background: #101010;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .arrows {
+            display: flex;
+            gap: 10px;
+        }
+
+        .arrow {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            background: #242424;
+            color: white;
+            font-size: 18px;
+        }
+
+        .search {
+            width: 350px;
+            background: #242424;
+            border: none;
+            outline: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            color: white;
+        }
+
+        .profile {
+            background: #242424;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 35px;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #999;
+        }
+
+        /* QUICK PLAYLIST */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .quick-card {
+            height: 80px;
+            background: #181818;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            transition: .3s;
+        }
+
+        .quick-card:hover {
+            background: #282828;
+        }
+
+        .quick-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .quick-card span {
+            padding-left: 15px;
+            font-weight: bold;
+        }
+
+        .quick-play {
+            margin-left: auto;
+            margin-right: 15px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: #1ed760;
+            font-size: 16px;
+        }
+
+        /* SECTION */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .section-header h2 {
+            font-size: 23px;
+        }
+
+        .section-header a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .section-header a:hover {
+            color: white;
+        }
+
+        /* SONG GRID */
+        .song-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+        }
+
+        .song-card {
+            background: #151515;
+            padding: 15px;
+            border-radius: 8px;
+            transition: .3s;
+            position: relative;
+        }
+
+        .song-card:hover {
+            background: #222;
+            transform: translateY(-3px);
+        }
+
+        .cover {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 13px;
+        }
+
+        .song-card h3 {
+            font-size: 15px;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-card p {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .play-card {
+            position: absolute;
+            right: 20px;
+            bottom: 65px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: #1ed760;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: .3s;
+        }
+
+        .song-card:hover .play-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ALBUM */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 18px;
+        }
+
+        .album {
+            background: #151515;
+            padding: 14px;
+            border-radius: 8px;
+            transition: .3s;
+        }
+
+        .album:hover {
+            background: #222;
+        }
+
+        .album img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .album h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .album p {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* PLAYER */
+        .player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90px;
+            background: #181818;
+            border-top: 1px solid #333;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .now-playing img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .now-info h4 {
+            font-size: 13px;
+        }
+
+        .now-info p {
+            color: #888;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .like {
+            color: #aaa;
+            border: none;
+            background: transparent;
+            font-size: 18px;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-buttons button {
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 16px;
+        }
+
+        .play-main {
+            width: 35px;
+            height: 35px;
+            background: white !important;
+            color: black !important;
+            border-radius: 50%;
+        }
+
+        .progress-area {
+            display: flex;
+            align-items: center;
+            width: 80%;
+            gap: 10px;
+            font-size: 10px;
+            color: #888;
+        }
+
+        .progress {
+            flex: 1;
+            height: 4px;
+            appearance: none;
+            background: #555;
+            border-radius: 5px;
+        }
+
+        .progress::-webkit-slider-thumb {
+            appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        /* VOLUME */
+        .volume {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .volume input {
+            width: 100px;
+            accent-color: #1ed760;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 1100px) {
+            .song-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .album-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 800px) {
+            .sidebar {
+                width: 70px;
+                padding: 20px 10px;
+            }
+
+            .logo {
+                font-size: 0;
+                text-align: center;
+            }
+
+            .logo::after {
+                content: "♫";
+                font-size: 25px;
+            }
+
+            .menu a span:not(.menu-icon),
+            .menu-title {
+                display: none;
+            }
+
+            .menu a {
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+
+            .song-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .album-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .player {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .volume {
+                display: none;
+            }
+
+            .search {
+                width: 200px;
+            }
+        }
+
+        @media(max-width: 550px) {
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .arrows {
+                display: none;
+            }
+
+            .search {
+                width: 180px;
+            }
+
+            .profile {
+                display: none;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .song-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .album-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .now-info {
+                display: none;
+            }
+
+            .progress-area {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            Music<span>Flow</span>
+        </div>
+
+        <div class="menu">
+
+            <a href="#" class="active">
+                <span class="menu-icon">⌂</span>
+                <span>Beranda</span>
+            </a>
+
+            <a href="#search">
+                <span class="menu-icon">⌕</span>
+                <span>Cari</span>
+            </a>
+
+            <a href="#library">
+                <span class="menu-icon">▣</span>
+                <span>Library</span>
+            </a>
+
+            <p class="menu-title">Playlist Kamu</p>
+
+            <a href="#">
+                <span class="menu-icon">♥</span>
+                <span>Lagu Disukai</span>
+            </a>
+
+            <a href="#">
+                <span class="menu-icon">♫</span>
+                <span>Favorit Saya</span>
+            </a>
+
+            <a href="#">
+                <span class="menu-icon">+</span>
+                <span>Buat Playlist</span>
+            </a>
+
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="arrows">
+                <button class="arrow">‹</button>
+                <button class="arrow">›</button>
+            </div>
+
+            <input
+                type="text"
+                class="search"
+                id="search"
+                placeholder="🔍 Apa yang ingin kamu dengarkan?"
+                onkeyup="searchMusic()"
+            >
+
+            <div class="profile">
+                👤 User
+            </div>
+
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- WELCOME -->
+            <section class="welcome">
+                <h1>Selamat Datang 👋</h1>
+                <p>Dengarkan musik favoritmu kapan saja.</p>
+            </section>
+
+            <!-- QUICK PLAYLIST -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>Playlist Kamu</h2>
+                    <a href="#">Lihat Semua</a>
+                </div>
+
+                <div class="quick-grid">
+
+                    <div class="quick-card">
+                        <img src="https://picsum.photos/200?random=1">
+                        <span>Favorit Saya</span>
+                        <button
+                            class="quick-play"
+                            onclick="playSong(0)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="quick-card">
+                        <img src="https://picsum.photos/200?random=2">
+                        <span>Chill Music</span>
+                        <button
+                            class="quick-play"
+                            onclick="playSong(1)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="quick-card">
+                        <img src="https://picsum.photos/200?random=3">
+                        <span>Workout</span>
+                        <button
+                            class="quick-play"
+                            onclick="playSong(2)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="quick-card">
+                        <img src="https://picsum.photos/200?random=4">
+                        <span>Party Mix</span>
+                        <button
+                            class="quick-play"
+                            onclick="playSong(3)">
+                            ▶
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SONGS -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>Lagu Populer</h2>
+                    <a href="#">Lihat Semua</a>
+                </div>
+
+                <div class="song-grid" id="songGrid">
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=10">
+
+                        <h3>Midnight Dreams</h3>
+                        <p>Alex Morgan</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(0)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=11">
+
+                        <h3>Beautiful Day</h3>
+                        <p>John Miller</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(1)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=12">
+
+                        <h3>Ocean Eyes</h3>
+                        <p>Sarah Lee</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(2)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=13">
+
+                        <h3>Summer Love</h3>
+                        <p>Daniel Stone</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(3)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=14">
+
+                        <h3>Lost In Time</h3>
+                        <p>Emma Wilson</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(4)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=15">
+
+                        <h3>Night Drive</h3>
+                        <p>Chris Martin</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(5)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=16">
+
+                        <h3>Forever Young</h3>
+                        <p>Michael Ray</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(6)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=17">
+
+                        <h3>Golden Sky</h3>
+                        <p>Anna Rose</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(7)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=18">
+
+                        <h3>Rainy Morning</h3>
+                        <p>Kevin Hart</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(8)">
+                            ▶
+                        </button>
+                    </div>
+
+                    <div class="song-card">
+                        <img
+                            class="cover"
+                            src="https://picsum.photos/400?random=19">
+
+                        <h3>Dreaming</h3>
+                        <p>Olivia Blue</p>
+
+                        <button
+                            class="play-card"
+                            onclick="playSong(9)">
+                            ▶
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ALBUM -->
+            <section class="section" id="library">
+
+                <div class="section-header">
+                    <h2>Album Pilihan</h2>
+                    <a href="#">Lihat Semua</a>
+                </div>
+
+                <div class="album-grid">
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=30">
+                        <h3>New Beginning</h3>
+                        <p>Various Artists</p>
+                    </div>
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=31">
+                        <h3>Summer Vibes</h3>
+                        <p>Various Artists</p>
+                    </div>
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=32">
+                        <h3>Relax</h3>
+                        <p>Chill Music</p>
+                    </div>
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=33">
+                        <h3>Night Party</h3>
+                        <p>DJ Collection</p>
+                    </div>
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=34">
+                        <h3>Acoustic</h3>
+                        <p>Acoustic Band</p>
+                    </div>
+
+                    <div class="album">
+                        <img src="https://picsum.photos/400?random=35">
+                        <h3>Best Hits</h3>
+                        <p>Top Artists</p>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MUSIC PLAYER -->
+    <div class="player">
+
+        <div class="now-playing">
+
+            <img
+                id="playerCover"
+                src="https://picsum.photos/200?random=10">
+
+            <div class="now-info">
+                <h4 id="playerTitle">
+                    Midnight Dreams
+                </h4>
+
+                <p id="playerArtist">
+                    Alex Morgan
+                </p>
+            </div>
+
+            <button class="like">
+                ♡
+            </button>
+
+        </div>
+
+        <div class="controls">
+
+            <div class="control-buttons">
+
+                <button onclick="previousSong()">
+                    ⏮
+                </button>
+
+                <button
+                    class="play-main"
+                    id="playButton"
+                    onclick="togglePlay()">
+                    ▶
+                </button>
+
+                <button onclick="nextSong()">
+                    ⏭
+                </button>
+
+            </div>
+
+            <div class="progress-area">
+
+                <span id="currentTime">
+                    0:00
+                </span>
+
+                <input
+                    type="range"
+                    class="progress"
+                    id="progress"
+                    min="0"
+                    max="100"
+                    value="0"
+                >
+
+                <span>
+                    3:45
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="volume">
+
+            <span>🔊</span>
+
+            <input
+                type="range"
+                min="0"
+                max="100"
+                value="70">
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        const songs = [
+            {
+                title: "Midnight Dreams",
+                artist: "Alex Morgan",
+                cover: "https://picsum.photos/400?random=10"
+            },
+            {
+                title: "Beautiful Day",
+                artist: "John Miller",
+                cover: "https://picsum.photos/400?random=11"
+            },
+            {
+                title: "Ocean Eyes",
+                artist: "Sarah Lee",
+                cover: "https://picsum.photos/400?random=12"
+            },
+            {
+                title: "Summer Love",
+                artist: "Daniel Stone",
+                cover: "https://picsum.photos/400?random=13"
+            },
+            {
+                title: "Lost In Time",
+                artist: "Emma Wilson",
+                cover: "https://picsum.photos/400?random=14"
+            },
+            {
+                title: "Night Drive",
+                artist: "Chris Martin",
+                cover: "https://picsum.photos/400?random=15"
+            },
+            {
+                title: "Forever Young",
+                artist: "Michael Ray",
+                cover: "https://picsum.photos/400?random=16"
+            },
+            {
+                title: "Golden Sky",
+                artist: "Anna Rose",
+                cover: "https://picsum.photos/400?random=17"
+            },
+            {
+                title: "Rainy Morning",
+                artist: "Kevin Hart",
+                cover: "https://picsum.photos/400?random=18"
+            },
+            {
+                title: "Dreaming",
+                artist: "Olivia Blue",
+                cover: "https://picsum.photos/400?random=19"
+            }
+        ];
+
+        let currentSong = 0;
+        let playing = false;
+
+        function playSong(index) {
+
+            currentSong = index;
+
+            document.getElementById("playerTitle")
+                .textContent = songs[index].title;
+
+            document.getElementById("playerArtist")
+                .textContent = songs[index].artist;
+
+            document.getElementById("playerCover")
+                .src = songs[index].cover;
+
+            playing = true;
+
+            document.getElementById("playButton")
+                .textContent = "❚❚";
+
+        }
+
+        function togglePlay() {
+
+            playing = !playing;
+
+            const button =
+                document.getElementById("playButton");
+
+            if (playing) {
+                button.textContent = "❚❚";
+            } else {
+                button.textContent = "▶";
+            }
+        }
+
+        function nextSong() {
+
+            currentSong++;
+
+            if (currentSong >= songs.length) {
+                currentSong = 0;
+            }
+
+            playSong(currentSong);
+        }
+
+        function previousSong() {
+
+            currentSong--;
+
+            if (currentSong < 0) {
+                currentSong = songs.length - 1;
+            }
+
+            playSong(currentSong);
+        }
+
+        function searchMusic() {
+
+            const keyword =
+                document.getElementById("search")
+                .value
+                .toLowerCase();
+
+            const cards =
+                document.querySelectorAll(".song-card");
+
+            cards.forEach(function(card) {
+
+                const title =
+                    card.querySelector("h3")
+                    .textContent
+                    .toLowerCase();
+
+                const artist =
+                    card.querySelector("p")
+                    .textContent
+                    .toLowerCase();
+
+                if (
+                    title.includes(keyword) ||
+                    artist.includes(keyword)
+                ) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+
+            });
+        }
+
+        const progress =
+            document.getElementById("progress");
+
+        progress.addEventListener("input", function() {
+
+            document.getElementById("currentTime")
+                .textContent = "1:30";
+
+        });
+
+    </script>
+
+</body>
+</html>
+```
